@@ -8,6 +8,8 @@ def count_vectorization(text_data):
     X_count = count_vectorizer.fit_transform(text_data)
     return pd.DataFrame(X_count.toarray(), columns=count_vectorizer.get_feature_names_out())
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 def tfidf_vectorization(text_data):
     tfidf_vectorizer = TfidfVectorizer()
     X_tfidf = tfidf_vectorizer.fit_transform(text_data)

@@ -1,59 +1,49 @@
-import nltk
-from pathlib import Path
-import pandas as pd
+# src/train/train.py
+# src/train/train.py
+
+# train.py
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+from src.data_load import load_dataset
+import pickle
+from src.text_processing import tokenize_text, remove_stopwords, apply_lemmatization
+from src.feature_engineering import tfidf_vectorization
+from src.evaluation import evaluate_model
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import accuracy_score, classification_report
-import joblib
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
+from sklearn.linear_model import LogisticRegression
 
-# Download NLTK punkt resource
-nltk.download('punkt')
-nltk.download('stopwords')
 
-# Load data - adjust the path based on your directory structure
-current_dir = Path(__file__).resolve().parent
-data_dir = current_dir.parent.parent / '/workspaces/Final-Project/data'  # Adjust based on your actual directory structure
-train_data = pd.read_csv(data_dir / 'raw' / 'train.csv')
+# Load training dataset
+current_dir = os.path.dirname(os.path.realpath(__file__))
+train_data = load_dataset('train.csv')
 
-# Tokenization
-train_data['tokenized_reviews'] = train_data['review'].apply(word_tokenize)
+# Text processing for training data
+train_data['tokenized_reviews'] = train_data['review'].apply(tokenize_text)
+train_data['filtered_reviews'] = train_data['tokenized_reviews'].apply(remove_stopwords)
+train_data['lemmatized_reviews'] = train_data['filtered_reviews'].apply(apply_lemmatization)
 
-# Stop-words Filtering
-stop_words = set(stopwords.words('english'))
-train_data['filtered_reviews'] = train_data['tokenized_reviews'].apply(lambda tokens: [word for word in tokens if word.lower() not in stop_words])
+# Feature engineering for training data
+X_train_tfidf = tfidf_vectorization(train_data['lemmatized_reviews'])
+y_train = train_data['sentiment']
 
-# Assuming you have 'filtered_reviews' or 'lemmatized_reviews' as your processed data
-X = train_data['filtered_reviews']  # Change to 'lemmatized_reviews' if needed
-y = train_data['sentiment']
+# Split the training data
+X_train, X_val, y_train, y_val = train_test_split(X_train_tfidf, y_train, test_size=0.2, random_state=42)
 
-# Split the data
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Vectorize using TF-IDF Vectorization
-vectorizer = TfidfVectorizer()
-X_train_vectorized = vectorizer.fit_transform(X_train.apply(lambda tokens: ' '.join(tokens)))
-X_val_vectorized = vectorizer.transform(X_val.apply(lambda tokens: ' '.join(tokens)))
-
-# Train Naive Bayes Model
-nb_model = MultinomialNB()
-nb_model.fit(X_train_vectorized, y_train)
-
-# Make predictions on the validation set
-predictions_val = nb_model.predict(X_val_vectorized)
-
-# Evaluate the model
-accuracy = accuracy_score(y_val, predictions_val)
-classification_rep = classification_report(y_val, predictions_val)
-
-# Print or log the evaluation results
-print(f"Validation Accuracy: {accuracy}")
-print("Classification Report:\n", classification_rep)
+# Build and train the model
+model = LogisticRegression()
+model.fit(X_train, y_train)
 
 # Save the trained model
-output_dir = current_dir / '../../outputs/models'  # Adjust based on your actual directory structure
-output_dir.mkdir(parents=True, exist_ok=True)  # Create the directory if it doesn't exist
-model_filename = output_dir / 'sentiment_model.pkl'
-joblib.dump(nb_model, model_filename)
+model_filename = os.path.join(current_dir, '..', '..', 'outputs', 'models', 'logistic_regression_model.pkl')
+with open(model_filename, 'wb') as model_file:
+    pickle.dump(model, model_file)
+
+# Load test dataset
+test_data = load_dataset('test.csv')
+
+# Text processing for test data
+test_data['tokenized_reviews'] = test_data['review'].apply(tokenize_text)
+test_data['filtered_reviews'] = test_data['tokenized_reviews'].apply(remove_stopwords)
+test_data['lemmatized_reviews'] = test_data['filtered_reviews'].apply(apply_lemmatization)
+

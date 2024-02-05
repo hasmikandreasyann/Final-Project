@@ -14,8 +14,6 @@ def load_dataset(file_name):
     return dataset
 
 if __name__ == "__main__":
-    # Example usage
+
     train_data = load_dataset('train.csv')
     test_data = load_dataset('test.csv')
-
-    # Add any additional processing or exploration as needed...
