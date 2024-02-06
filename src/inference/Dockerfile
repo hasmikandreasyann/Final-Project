@@ -8,10 +8,10 @@ WORKDIR /app
 COPY . /app
 
 # Copy requirements.txt into the container at /app
-COPY requirements.txt /app/requirements.txt
+COPY /workspaces/Final-Project/requirements.txt /app/requirements.txt
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run the training script
-CMD ["python", "src/train/train.py"]
+# Run the inference script
+CMD ["python", "src/inference/run_inference.py"]
