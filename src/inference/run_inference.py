@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 import joblib
 from src.data_load import load_dataset
-from src.feature_engineering import tfidf_vectorization, load_tfidf_vectorizer
+from src.feature_engineering import load_tfidf_vectorizer
 from src.text_processing import tokenize_text, remove_stopwords, apply_lemmatization
 from src.evaluation import evaluate_model
 
