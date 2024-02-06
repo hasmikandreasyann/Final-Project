@@ -29,7 +29,7 @@ y_train = train_data['sentiment']
 tfidf_vectorizer = joblib.load('tfidf_vectorizer.pkl')
 
 # Build and train the model
-model = LogisticRegression()
+model = LogisticRegression(max_iter=1000)
 model.fit(X_train_tfidf, y_train)
 
 # Directory to save the model
