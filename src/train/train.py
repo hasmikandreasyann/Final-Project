@@ -40,5 +40,13 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the trained model using joblib
-model_filename = os.path.join(output_dir, 'logistic_regression_model2.pkl')
+    
+ # Count the number of files in the directory
+num_files = len([file for file in os.listdir(output_dir) if file.endswith('.pkl')])
+
+    # Find the next available model number
+next_model_number = num_files + 1
+
+
+model_filename = os.path.join(output_dir, f'logistic_regression_model{next_model_number}.pkl')
 joblib.dump(model, model_filename)

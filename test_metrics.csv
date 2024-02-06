@@ -1,0 +1,31 @@
+Metric,Value
+Accuracy,0.8971
+Classification Report,"              precision    recall  f1-score   support
+
+    negative       0.91      0.88      0.90      5000
+    positive       0.89      0.91      0.90      5000
+
+    accuracy                           0.90     10000
+   macro avg       0.90      0.90      0.90     10000
+weighted avg       0.90      0.90      0.90     10000
+"
+Accuracy,0.8971
+Classification Report,"              precision    recall  f1-score   support
+
+    negative       0.91      0.88      0.90      5000
+    positive       0.89      0.91      0.90      5000
+
+    accuracy                           0.90     10000
+   macro avg       0.90      0.90      0.90     10000
+weighted avg       0.90      0.90      0.90     10000
+"
+Accuracy,0.8971
+Classification Report,"              precision    recall  f1-score   support
+
+    negative       0.91      0.88      0.90      5000
+    positive       0.89      0.91      0.90      5000
+
+    accuracy                           0.90     10000
+   macro avg       0.90      0.90      0.90     10000
+weighted avg       0.90      0.90      0.90     10000
+"
