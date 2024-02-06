@@ -25,6 +25,9 @@ train_data['lemmatized_reviews'] = train_data['filtered_reviews'].apply(apply_le
 X_train_tfidf = tfidf_vectorization(train_data['lemmatized_reviews'])
 y_train = train_data['sentiment']
 
+# Load the vectorizer instance whenever you need to transform new data
+tfidf_vectorizer = joblib.load('tfidf_vectorizer.pkl')
+
 # Build and train the model
 model = LogisticRegression()
 model.fit(X_train_tfidf, y_train)
@@ -37,5 +40,5 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the trained model using joblib
-model_filename = os.path.join(output_dir, 'logistic_regression_model.pkl')
+model_filename = os.path.join(output_dir, 'logistic_regression_model2.pkl')
 joblib.dump(model, model_filename)

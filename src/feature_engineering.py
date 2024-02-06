@@ -1,7 +1,7 @@
 # src/feature_engineering.py
 
-import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import joblib
 
 def count_vectorization(text_data):
     count_vectorizer = CountVectorizer()
@@ -11,7 +11,29 @@ def count_vectorization(text_data):
 def tfidf_vectorization(text_data):
     tfidf_vectorizer = TfidfVectorizer()
     X_tfidf = tfidf_vectorizer.fit_transform(text_data.apply(lambda tokens: ' '.join(tokens)))
+    joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
     return X_tfidf
+
+import joblib
+
+def load_tfidf_vectorizer():
+    # Print a message indicating the start of the loading process
+    print("Loading TF-IDF vectorizer...")
+
+    try:
+        # Attempt to load the TF-IDF vectorizer instance
+        tfidf_vectorizer = joblib.load('tfidf_vectorizer.pkl')
+        print("TF-IDF vectorizer loaded successfully.")
+        return tfidf_vectorizer
+    except FileNotFoundError:
+        # Handle the case where the file is not found
+        print("Error: TF-IDF vectorizer file not found.")
+        return None
+    except Exception as e:
+        # Handle any other exceptions that may occur during loading
+        print(f"Error occurred while loading TF-IDF vectorizer: {str(e)}")
+        return None
+
 
 
 if __name__ == "__main__":
