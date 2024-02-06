@@ -6,11 +6,9 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from src.data_load import load_dataset
-import pickle
 from src.text_processing import tokenize_text, remove_stopwords, apply_lemmatization
 from src.feature_engineering import tfidf_vectorization
-from src.evaluation import evaluate_model
-from sklearn.model_selection import train_test_split
+import joblib
 from sklearn.linear_model import LogisticRegression
 
 
@@ -27,23 +25,17 @@ train_data['lemmatized_reviews'] = train_data['filtered_reviews'].apply(apply_le
 X_train_tfidf = tfidf_vectorization(train_data['lemmatized_reviews'])
 y_train = train_data['sentiment']
 
-# Split the training data
-X_train, X_val, y_train, y_val = train_test_split(X_train_tfidf, y_train, test_size=0.2, random_state=42)
-
 # Build and train the model
 model = LogisticRegression()
-model.fit(X_train, y_train)
+model.fit(X_train_tfidf, y_train)
 
-# Save the trained model
-model_filename = os.path.join(current_dir, '..', '..', 'outputs', 'models', 'logistic_regression_model.pkl')
-with open(model_filename, 'wb') as model_file:
-    pickle.dump(model, model_file)
+# Directory to save the model
+output_dir = os.path.join(current_dir, '..', '..', 'outputs', 'models')
+    
+# Create the directory if it doesn't exist
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-# Load test dataset
-test_data = load_dataset('test.csv')
-
-# Text processing for test data
-test_data['tokenized_reviews'] = test_data['review'].apply(tokenize_text)
-test_data['filtered_reviews'] = test_data['tokenized_reviews'].apply(remove_stopwords)
-test_data['lemmatized_reviews'] = test_data['filtered_reviews'].apply(apply_lemmatization)
-
+# Save the trained model using joblib
+model_filename = os.path.join(output_dir, 'logistic_regression_model.pkl')
+joblib.dump(model, model_filename)

@@ -1,34 +1,38 @@
-# run_inference.py
-import pandas as pd
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 import joblib
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import accuracy_score, classification_report
+from src.data_load import load_dataset
+from src.feature_engineering import tfidf_vectorization
+from src.text_processing import tokenize_text, remove_stopwords, apply_lemmatization
+from src.evaluation import evaluate_model
 
-# Load the trained model
-model = joblib.load('models/sentiment_model.pkl')  # Adjust based on your actual path
+if __name__ == "__main__":
+    # Load the trained model
+    model = joblib.load('outputs/models/logistic_regression_model2.pkl')  
 
-# Load test data
-test_data = pd.read_csv('test.csv')  # Adjust based on your actual path
+    # Load test data
+    test_data = load_dataset('test.csv')
 
-# Assuming you have 'filtered_reviews' or 'lemmatized_reviews' as your processed data
-X_test = test_data['lemmatized_reviews']  # Change to 'filtered_reviews' if needed
-y_test = test_data['sentiment']
+    # Text processing for test data
+    test_data['tokenized_reviews'] = test_data['review'].apply(tokenize_text)
+    test_data['filtered_reviews'] = test_data['tokenized_reviews'].apply(remove_stopwords)
+    test_data['lemmatized_reviews'] = test_data['filtered_reviews'].apply(apply_lemmatization)  
+    
+    y_test = test_data['sentiment']
+    X_test_tfidf = tfidf_vectorization(test_data['lemmatized_reviews'])
 
-# Vectorize using TF-IDF Vectorization (using the same vectorizer as in train.py)
-vectorizer = TfidfVectorizer()
-X_test_vectorized = vectorizer.transform(X_test.apply(lambda tokens: ' '.join(tokens)))
+    # Make predictions on the test set
+    predictions_test = model.predict(X_test_tfidf)
 
-# Make predictions on the test set
-predictions_test = model.predict(X_test_vectorized)
+    # Evaluate the model on the test set using the imported evaluate_model function
+    accuracy, classification_rep = evaluate_model(predictions_test, y_test)
 
-# Evaluate the model on the test set
-accuracy = accuracy_score(y_test, predictions_test)
-classification_rep = classification_report(y_test, predictions_test)
+    # Print the evaluation results
+    print(f"Test Accuracy: {accuracy}")
+    print("Test Classification Report:\n", classification_rep)
 
-# Print or log the evaluation results
-print(f"Test Accuracy: {accuracy}")
-print("Test Classification Report:\n", classification_rep)
-
-# Optionally, store the test metric in a file or use it as needed
-with open('README.md', 'a') as readme:
-    readme.write(f"\n\n## Best Test Metric\nThe best test metric achieved during model evaluation is {accuracy}.")
+    # Optionally, store the test metric in a file or use it as needed
+    with open('README.md', 'a') as readme:
+        readme.write(f"\n\n## Best Test Metric\nThe best test metric achieved during model evaluation is {accuracy}.")

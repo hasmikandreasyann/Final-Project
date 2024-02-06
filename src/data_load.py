@@ -4,9 +4,8 @@ import pandas as pd
 from pathlib import Path
 
 def load_dataset(file_name):
-    # Adjust the path based on your directory structure
     current_dir = Path(__file__).resolve().parent
-    data_dir = current_dir.parent / 'data'  # Adjust based on your actual directory structure
+    data_dir = current_dir.parent / 'data'  
     file_path = data_dir / 'raw' / file_name
 
     # Load the dataset
